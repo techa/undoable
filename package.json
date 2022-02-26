@@ -2,8 +2,13 @@
   "name": "undoable",
   "version": "0.0.1",
   "type": "module",
+  "main":"dist/index.cjs",
+  "module":"dist/index.js",
+  "types": "dist/index.d.ts",
+
   "scripts": {
-    "test": "ava"
+    "test": "ava",
+	"build":"tsc | tsc src/index.ts --module ES2015"
   },
   "devDependencies": {
     "ava": "^4.0.1",

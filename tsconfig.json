@@ -15,17 +15,14 @@
 		*/
 		"preserveValueImports": true,
 		"isolatedModules": true,
-		"resolveJsonModule": true,
-		/**
-			To have warnings/errors of the Svelte compiler at the correct position,
-			enable source maps by default.
-		*/
-		"sourceMap": true,
+
+		"declaration": true,
+		"outDir": "dist",
 		"esModuleInterop": true,
 		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true,
-		"baseUrl": ".",
-		"allowJs": true,
-		"checkJs": true
-	}
+		"baseUrl": "."
+	},
+	"include": ["src/**/*.ts"],
+	"exclude": ["src/**/*.test.ts"]
 }
