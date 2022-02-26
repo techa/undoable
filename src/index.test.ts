@@ -45,6 +45,12 @@ test(`Undoable.length`, (t) => {
 	t.is(val.length, 2)
 })
 
+test(`Undoable.update`, (t) => {
+	const val = new Undoable([1, 2, 3, 4])
+	val.update((arr) => [...arr.map((v) => v + 1)])
+	t.deepEqual(val.get(), [2, 3, 4, 5])
+})
+
 test(`ExUndoable.validator`, (t) => {
 	class ExUndoable extends Undoable {
 		validator(value) {

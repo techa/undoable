@@ -33,6 +33,11 @@ export class Undoable<T = unknown> {
 		}
 	}
 
+	update(cb: (value: T) => T): void {
+		this.set(cb(this.#stack[this.#index]))
+		return
+	}
+
 	/**
 	 * Method supposed to "extends"
 	 * @param nowValue
