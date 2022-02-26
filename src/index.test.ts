@@ -1,5 +1,5 @@
 import test from 'ava'
-import { Undoable } from './Undoable.js'
+import { Undoable } from './index.js'
 
 test(`Undoable.canUndo`, (t) => {
 	const val = new Undoable(0)
