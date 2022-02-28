@@ -24,9 +24,14 @@ export class Undoable {
     get() {
         return __classPrivateFieldGet(this, _Undoable_stack, "f")[__classPrivateFieldGet(this, _Undoable_index, "f")];
     }
+    /**
+     * @param newValue
+     * @returns Succeed in adding it?
+     */
     set(newValue) {
         var _a;
-        if (this.notEqual(__classPrivateFieldGet(this, _Undoable_stack, "f")[__classPrivateFieldGet(this, _Undoable_index, "f")], newValue)) {
+        const notEqual = this.notEqual(__classPrivateFieldGet(this, _Undoable_stack, "f")[__classPrivateFieldGet(this, _Undoable_index, "f")], newValue);
+        if (notEqual) {
             if (__classPrivateFieldGet(this, _Undoable_stack, "f").length > __classPrivateFieldGet(this, _Undoable_index, "f") + 1) {
                 __classPrivateFieldGet(this, _Undoable_stack, "f").length = __classPrivateFieldGet(this, _Undoable_index, "f") + 1;
             }
@@ -37,10 +42,10 @@ export class Undoable {
                 __classPrivateFieldSet(this, _Undoable_index, __classPrivateFieldGet(this, _Undoable_stack, "f").length, "f");
             }
         }
+        return notEqual;
     }
     update(cb) {
-        this.set(cb(__classPrivateFieldGet(this, _Undoable_stack, "f")[__classPrivateFieldGet(this, _Undoable_index, "f")]));
-        return;
+        return this.set(cb(__classPrivateFieldGet(this, _Undoable_stack, "f")[__classPrivateFieldGet(this, _Undoable_index, "f")]));
     }
     /**
      * Method supposed to "extends"
@@ -88,11 +93,17 @@ export class Undoable {
     reset() {
         __classPrivateFieldSet(this, _Undoable_index, 0, "f");
         this.set(__classPrivateFieldGet(this, _Undoable_stack, "f")[__classPrivateFieldGet(this, _Undoable_index, "f")]);
+        __classPrivateFieldSet(this, _Undoable_index, 0, "f");
         return this;
     }
-    clear() {
-        __classPrivateFieldSet(this, _Undoable_stack, __classPrivateFieldGet(this, _Undoable_stack, "f").slice(0, 1), "f");
-        return this.reset();
+    clear(value) {
+        __classPrivateFieldSet(this, _Undoable_stack, [
+            value === undefined
+                ? __classPrivateFieldGet(this, _Undoable_stack, "f")[__classPrivateFieldGet(this, _Undoable_index, "f")]
+                : this.validator(value),
+        ], "f");
+        __classPrivateFieldSet(this, _Undoable_index, 0, "f");
+        return this;
     }
 }
 _Undoable_stack = new WeakMap(), _Undoable_index = new WeakMap();

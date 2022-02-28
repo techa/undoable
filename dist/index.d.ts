@@ -6,8 +6,12 @@ export declare class Undoable<T = unknown> {
     });
     get length(): number;
     get(): T;
-    set(newValue: T): void;
-    update(cb: (value: T) => T): void;
+    /**
+     * @param newValue
+     * @returns Succeed in adding it?
+     */
+    set(newValue: T): boolean;
+    update(cb: (value: T) => T): boolean;
     /**
      * Method supposed to "extends"
      * @param nowValue
@@ -26,5 +30,5 @@ export declare class Undoable<T = unknown> {
     canUndo(): boolean;
     canRedo(): boolean;
     reset(): this;
-    clear(): this;
+    clear(value?: T): this;
 }
