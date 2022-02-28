@@ -31,6 +31,8 @@ export class Undoable<T = unknown> {
 			this.#stack.push(this.validator(newValue))
 			this.#index++
 
+			this.onUpdate()
+
 			if (this.capacity > 1 && this.#stack.length > this.capacity) {
 				this.#stack.shift()
 				this.#index = this.#stack.length
@@ -42,6 +44,11 @@ export class Undoable<T = unknown> {
 	update(cb: (value: T) => T): boolean {
 		return this.set(cb(this.#stack[this.#index]))
 	}
+
+	/**
+	 * extend methd
+	 */
+	 onUpdate() {}
 
 	/**
 	 * Method supposed to "extends"
@@ -61,6 +68,7 @@ export class Undoable<T = unknown> {
 	 * Method supposed to "extends"
 	 * @param value
 	 * @returns
+	 * @ constructor() .set() .clear()
 	 */
 	validator(value: T): T {
 		return value
