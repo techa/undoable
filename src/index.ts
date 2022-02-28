@@ -66,19 +66,19 @@ export class Undoable<T = unknown> {
 		return value
 	}
 
-	undo(): this {
+	undo(): boolean {
 		if (this.#index > 0) {
 			this.#index--
+			return true
 		}
-		this.set(this.#stack[this.#index])
-		return this
+		return false
 	}
-	redo(): this {
+	redo(): boolean {
 		if (this.#index < this.#stack.length - 1) {
 			this.#index++
+			return true
 		}
-		this.set(this.#stack[this.#index])
-		return this
+		return false
 	}
 	canUndo(): boolean {
 		return this.#index > 0

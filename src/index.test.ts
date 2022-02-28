@@ -1,5 +1,6 @@
 import test from 'ava'
 import { Undoable } from './index.js'
+// import { Undoable } from '../dist/index.js'
 
 test(`Undoable.canUndo`, (t) => {
 	const val = new Undoable(0)
@@ -34,7 +35,10 @@ test(`Undoable.redo`, (t) => {
 	t.is(val.update((val) => val + 0), false)
 	val.set(3)
 	val.set(4)
-	t.is(val.undo().undo().redo().get(), 3)
+	val.undo()
+	val.undo()
+	val.redo()
+	t.is(val.get(), 3)
 })
 
 test(`Undoable.length`, (t) => {
@@ -52,7 +56,8 @@ test(`Undoable.update`, (t) => {
 	t.deepEqual(val.get(), [1, 2, 3, 4])
 	val.update((arr) => [...arr.map((v) => v + 1)])
 	t.deepEqual(val.get(), [2, 3, 4, 5])
-	t.deepEqual(val.undo().get(), [1, 2, 3, 4])
+	t.is(val.undo(), true)
+	t.deepEqual(val.get(), [1, 2, 3, 4])
 })
 
 test(`ExUndoable.validator`, (t) => {
@@ -66,7 +71,10 @@ test(`ExUndoable.validator`, (t) => {
 	val.set(2)
 	val.set(3)
 	val.set(4)
-	t.is(val.undo().undo().redo().get(), '3')
+	val.undo()
+	val.undo()
+	val.redo()
+	t.is(val.get(), '3')
 })
 
 test(`ExUndoable.notEqual`, (t) => {
@@ -89,12 +97,16 @@ test(`ExUndoable.notEqual`, (t) => {
 	t.is(val.set([{ x: 0, y: 0, z: 8 }]), true)
 	t.is(val.set([{ x: 0 }]), true)
 	t.is(val.set([{ y: 0 }]), true)
-	t.deepEqual(val.undo().undo().redo().undo().get(), [{ x: 0, y: 0, z: 8 }])
+	val.undo()
+	val.undo()
+	val.redo()
+	val.undo()
+	t.deepEqual(val.get(), [{ x: 0, y: 0, z: 8 }])
 })
 
 test(`Undoable.notEqual`, (t) => {
 	const val = new Undoable<{}[]>([{ x: 0, y: 0 }])
-	t.is(val.set(val.get()), true)
+	t.is(val.set([]), true)
 	t.is(val.canUndo(), true)
 
 	t.is(val.set([{ x: 0, y: 0 }]), true)
@@ -106,7 +118,13 @@ test(`Undoable.notEqual`, (t) => {
 	t.is(val.set([{ x: 0, y: 0, z: 8 }]), true)
 	t.is(val.set([{ x: 0 }]), true)
 	t.is(val.set([{ y: 0 }]), true)
-	t.deepEqual(val.undo().undo().redo().undo().get(), [{ x: 0, y: 0, z: 8 }])
+	t.is(val.length, 7)
+	t.is(val.canUndo(), true)
+	t.is(val.undo(), true) //x: 0
+	t.is(val.undo(), true) //x: 0, y: 0, z: 8
+	t.is(val.redo(), true) //x: 0 - failed?
+	t.is(val.undo(), true) //x: 0, y: 0, z: 8
+	t.deepEqual(val.get(), [{ x: 0, y: 0, z: 8 }])
 })
 
 test(`Undoable.reset`, (t) => {
@@ -119,7 +137,8 @@ test(`Undoable.reset`, (t) => {
 	t.is(val.canUndo(), false)
 	t.is(val.canRedo(), true)
 	t.is(val.get(), 0)
-	t.is(val.redo().get(), 1)
+	t.is(val.redo(), true)
+	t.is(val.get(), 1)
 })
 
 test(`Undoable.clear`, (t) => {
