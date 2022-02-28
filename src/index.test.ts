@@ -108,3 +108,36 @@ test(`Undoable.notEqual`, (t) => {
 	t.is(val.set([{ y: 0 }]), true)
 	t.deepEqual(val.undo().undo().redo().undo().get(), [{ x: 0, y: 0, z: 8 }])
 })
+
+test(`Undoable.reset`, (t) => {
+	const val = new Undoable(0)
+	val.set(1)
+	val.set(2)
+	val.set(3)
+	val.set(4)
+	val.reset()
+	t.is(val.canUndo(), false)
+	t.is(val.canRedo(), true)
+	t.is(val.get(), 0)
+	t.is(val.redo().get(), 1)
+})
+
+test(`Undoable.clear`, (t) => {
+	const val = new Undoable<{}[]>([{ x: 0, y: 0 }])
+	val.set(val.get())
+	val.set([{ x: 0, y: 0 }])
+	val.set([{ y: 0, x: 0 }])
+
+	val.clear([])
+	t.is(val.canUndo(), false)
+	t.deepEqual(val.get(), [])
+
+
+	val.set([{ x: 0, y: 0, z: 8 }])
+	val.set([{ x: 0 }])
+	val.set([{ y: 0 }])
+
+	val.clear()
+	t.is(val.canUndo(), false)
+	t.deepEqual(val.get(), [{ y: 0 }])
+})

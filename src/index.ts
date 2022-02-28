@@ -89,10 +89,16 @@ export class Undoable<T = unknown> {
 	reset(): this {
 		this.#index = 0
 		this.set(this.#stack[this.#index])
+		this.#index = 0
 		return this
 	}
-	clear(): this {
-		this.#stack = this.#stack.slice(0, 1)
-		return this.reset()
+	clear(value?: T): this {
+		this.#stack = [
+			value === undefined
+				? this.#stack[this.#index]
+				: this.validator(value),
+		]
+		this.#index = 0
+		return this
 	}
 }
