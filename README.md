@@ -1,10 +1,10 @@
 # Undoable
 > zero-dependency simple undoable class
 
-	npm install git+ssh://git@github.com:/
+	npm install git+ssh://git@github.com:/techa/undoable
 
 ```
 "dependencies": {
-	"bar": "git://github.com/techa/undoable.git"
+	"undoable": "git://github.com/techa/undoable.git"
 }
 ```
