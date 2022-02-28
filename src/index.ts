@@ -17,8 +17,13 @@ export class Undoable<T = unknown> {
 		return this.#stack[this.#index]
 	}
 
-	set(newValue: T): void {
-		if (this.notEqual(this.#stack[this.#index], newValue)) {
+	/**
+	 * @param newValue
+	 * @returns Succeed in adding it?
+	 */
+	set(newValue: T): boolean {
+		const notEqual = this.notEqual(this.#stack[this.#index], newValue)
+		if (notEqual) {
 			if (this.#stack.length > this.#index + 1) {
 				this.#stack.length = this.#index + 1
 			}
@@ -31,11 +36,11 @@ export class Undoable<T = unknown> {
 				this.#index = this.#stack.length
 			}
 		}
+		return notEqual
 	}
 
-	update(cb: (value: T) => T): void {
-		this.set(cb(this.#stack[this.#index]))
-		return
+	update(cb: (value: T) => T): boolean {
+		return this.set(cb(this.#stack[this.#index]))
 	}
 
 	/**
