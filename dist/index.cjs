@@ -41,6 +41,7 @@ class Undoable {
             }
             __classPrivateFieldGet(this, _Undoable_stack, "f").push(this.validator(newValue));
             __classPrivateFieldSet(this, _Undoable_index, (_a = __classPrivateFieldGet(this, _Undoable_index, "f"), _a++, _a), "f");
+            this.onUpdate();
             if (this.capacity > 1 && __classPrivateFieldGet(this, _Undoable_stack, "f").length > this.capacity) {
                 __classPrivateFieldGet(this, _Undoable_stack, "f").shift();
                 __classPrivateFieldSet(this, _Undoable_index, __classPrivateFieldGet(this, _Undoable_stack, "f").length, "f");
@@ -51,6 +52,10 @@ class Undoable {
     update(cb) {
         return this.set(cb(__classPrivateFieldGet(this, _Undoable_stack, "f")[__classPrivateFieldGet(this, _Undoable_index, "f")]));
     }
+    /**
+     * extend methd
+     */
+    onUpdate() { }
     /**
      * Method supposed to "extends"
      * @param nowValue
@@ -68,6 +73,7 @@ class Undoable {
      * Method supposed to "extends"
      * @param value
      * @returns
+     * @ constructor() .set() .clear()
      */
     validator(value) {
         return value;
@@ -76,17 +82,17 @@ class Undoable {
         var _a;
         if (__classPrivateFieldGet(this, _Undoable_index, "f") > 0) {
             __classPrivateFieldSet(this, _Undoable_index, (_a = __classPrivateFieldGet(this, _Undoable_index, "f"), _a--, _a), "f");
+            return true;
         }
-        this.set(__classPrivateFieldGet(this, _Undoable_stack, "f")[__classPrivateFieldGet(this, _Undoable_index, "f")]);
-        return this;
+        return false;
     }
     redo() {
         var _a;
         if (__classPrivateFieldGet(this, _Undoable_index, "f") < __classPrivateFieldGet(this, _Undoable_stack, "f").length - 1) {
             __classPrivateFieldSet(this, _Undoable_index, (_a = __classPrivateFieldGet(this, _Undoable_index, "f"), _a++, _a), "f");
+            return true;
         }
-        this.set(__classPrivateFieldGet(this, _Undoable_stack, "f")[__classPrivateFieldGet(this, _Undoable_index, "f")]);
-        return this;
+        return false;
     }
     canUndo() {
         return __classPrivateFieldGet(this, _Undoable_index, "f") > 0;

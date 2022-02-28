@@ -13,6 +13,10 @@ export declare class Undoable<T = unknown> {
     set(newValue: T): boolean;
     update(cb: (value: T) => T): boolean;
     /**
+     * extend methd
+     */
+    onUpdate(): void;
+    /**
      * Method supposed to "extends"
      * @param nowValue
      * @param newValue
@@ -23,10 +27,11 @@ export declare class Undoable<T = unknown> {
      * Method supposed to "extends"
      * @param value
      * @returns
+     * @ constructor() .set() .clear()
      */
     validator(value: T): T;
-    undo(): this;
-    redo(): this;
+    undo(): boolean;
+    redo(): boolean;
     canUndo(): boolean;
     canRedo(): boolean;
     reset(): this;
