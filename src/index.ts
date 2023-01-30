@@ -34,7 +34,7 @@ export class Undoable<T = unknown> {
 
 			if (this.capacity > 1 && this.#stack.length > this.capacity) {
 				this.#stack.shift()
-				this.#index = this.#stack.length
+				this.#index = this.#stack.length - 1
 			}
 
 			this.onUpdate()

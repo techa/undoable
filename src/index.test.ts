@@ -80,6 +80,7 @@ test(`ExUndoable.validator`, (t) => {
 	t.is(val.get(), 3)
 })
 
+
 test(`Undoable`, (t) => {
 	const val = new Undoable<{}[]>([{ x: 0, y: 0 }])
 	t.is(val.set([]), true)
@@ -152,4 +153,29 @@ test(`Undoable.jump`, (t) => {
 	t.is(val.jump(2), true)
 	t.is(val.jump(2), false)
 	t.deepEqual(val.get(), [{ x: 2, y: 0, z: 8 }])
+})
+
+test(`Undoable capacity over`, (t) => {
+	const val = new Undoable<{}[]>([{ x: 0, y: 0 }])
+	val.capacity = 3
+	val.set([{ x: 1, y: 0 }])
+	val.set([{ x: 2, y: 0, z: 8 }])
+	val.set([{ x: 3 }])
+	val.set([{ y: 4 }])
+	t.is(val.set([{ x: 0, y: 0, z: 8 }]), true)
+	t.is(val.set([{ x: 0 }]), true)
+	t.is(val.set([{ y: 0 }]), true)
+
+	t.deepEqual(val.get(), [{ y: 0 }])
+
+	t.is(val.length, 3)
+	t.is(val.canUndo(), true)
+	t.is(val.undo(), true)
+	t.deepEqual(val.get(), [{ x: 0 }])
+	t.is(val.undo(), true)
+	t.deepEqual(val.get(), [{ x: 0, y: 0, z: 8 }])
+	t.is(val.undo(), false)
+	t.deepEqual(val.get(), [{ x: 0, y: 0, z: 8 }])
+	t.is(val.redo(), true)
+	t.deepEqual(val.get(), [{ x: 0 }])
 })
