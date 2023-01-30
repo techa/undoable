@@ -64,6 +64,18 @@ export class Undoable<T = unknown> {
 		return JSON.stringify(value)
 	}
 
+	jump(index: number): boolean {
+		if (
+			Number.isInteger(index) &&
+			this.#index !== index &&
+			index < this.#stack.length
+		) {
+			this.#index = index
+			return true
+		}
+		return false
+	}
+
 	undo(): boolean {
 		if (this.#index > 0) {
 			this.#index--
