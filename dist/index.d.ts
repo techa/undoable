@@ -1,9 +1,10 @@
+export interface UndoableOptions {
+    capacity?: number;
+}
 export declare class Undoable<T = unknown> {
     #private;
     capacity: number;
-    constructor(initial: T, options?: {
-        capacity: number;
-    });
+    constructor(initial: T, options?: UndoableOptions);
     get length(): number;
     get(): T;
     /**
@@ -15,21 +16,15 @@ export declare class Undoable<T = unknown> {
     /**
      * extend methd
      */
-    onUpdate(): void;
-    /**
-     * Method supposed to "extends"
-     * @param nowValue
-     * @param newValue
-     * @returns
-     */
-    notEqual(nowValue: T, newValue: T): boolean;
+    onCapacityOver(): void;
     /**
      * Method supposed to "extends"
      * @param value
      * @returns
-     * @ constructor() .set() .clear()
+     * @used constructor() .set() .clear()
      */
-    validator(value: T): T;
+    validator(value: T): string;
+    jump(index: number): boolean;
     undo(): boolean;
     redo(): boolean;
     canUndo(): boolean;

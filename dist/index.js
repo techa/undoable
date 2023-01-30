@@ -22,7 +22,7 @@ export class Undoable {
         return __classPrivateFieldGet(this, _Undoable_stack, "f").length;
     }
     get() {
-        return __classPrivateFieldGet(this, _Undoable_stack, "f")[__classPrivateFieldGet(this, _Undoable_index, "f")];
+        return JSON.parse(__classPrivateFieldGet(this, _Undoable_stack, "f")[__classPrivateFieldGet(this, _Undoable_index, "f")]);
     }
     /**
      * @param newValue
@@ -30,49 +30,49 @@ export class Undoable {
      */
     set(newValue) {
         var _a;
-        const notEqual = this.notEqual(__classPrivateFieldGet(this, _Undoable_stack, "f")[__classPrivateFieldGet(this, _Undoable_index, "f")], newValue);
+        const newVal = this.validator(newValue);
+        const notEqual = __classPrivateFieldGet(this, _Undoable_stack, "f")[__classPrivateFieldGet(this, _Undoable_index, "f")] !== newVal;
         if (notEqual) {
             if (__classPrivateFieldGet(this, _Undoable_stack, "f").length > __classPrivateFieldGet(this, _Undoable_index, "f") + 1) {
                 __classPrivateFieldGet(this, _Undoable_stack, "f").length = __classPrivateFieldGet(this, _Undoable_index, "f") + 1;
             }
-            __classPrivateFieldGet(this, _Undoable_stack, "f").push(this.validator(newValue));
+            __classPrivateFieldGet(this, _Undoable_stack, "f").push(newVal);
             __classPrivateFieldSet(this, _Undoable_index, (_a = __classPrivateFieldGet(this, _Undoable_index, "f"), _a++, _a), "f");
-            this.onUpdate();
             if (this.capacity > 1 && __classPrivateFieldGet(this, _Undoable_stack, "f").length > this.capacity) {
                 __classPrivateFieldGet(this, _Undoable_stack, "f").shift();
-                __classPrivateFieldSet(this, _Undoable_index, __classPrivateFieldGet(this, _Undoable_stack, "f").length, "f");
+                __classPrivateFieldSet(this, _Undoable_index, __classPrivateFieldGet(this, _Undoable_stack, "f").length - 1, "f");
+                this.onCapacityOver();
             }
         }
         return notEqual;
     }
     update(cb) {
-        return this.set(cb(__classPrivateFieldGet(this, _Undoable_stack, "f")[__classPrivateFieldGet(this, _Undoable_index, "f")]));
+        return this.set(cb(this.get()));
     }
     /**
      * extend methd
      */
-    onUpdate() { }
-    /**
-     * Method supposed to "extends"
-     * @param nowValue
-     * @param newValue
-     * @returns
-     */
-    notEqual(nowValue, newValue) {
-        return nowValue != nowValue
-            ? newValue == newValue
-            : nowValue !== newValue ||
-                (nowValue && typeof nowValue === 'object') ||
-                typeof nowValue === 'function';
-    }
+    onCapacityOver() { }
     /**
      * Method supposed to "extends"
      * @param value
      * @returns
-     * @ constructor() .set() .clear()
+     * @used constructor() .set() .clear()
      */
     validator(value) {
-        return value;
+        if (typeof value === 'string') {
+            return value;
+        }
+        return JSON.stringify(value);
+    }
+    jump(index) {
+        if (Number.isInteger(index) &&
+            __classPrivateFieldGet(this, _Undoable_index, "f") !== index &&
+            index < __classPrivateFieldGet(this, _Undoable_stack, "f").length) {
+            __classPrivateFieldSet(this, _Undoable_index, index, "f");
+            return true;
+        }
+        return false;
     }
     undo() {
         var _a;
@@ -98,7 +98,7 @@ export class Undoable {
     }
     reset() {
         __classPrivateFieldSet(this, _Undoable_index, 0, "f");
-        this.set(__classPrivateFieldGet(this, _Undoable_stack, "f")[__classPrivateFieldGet(this, _Undoable_index, "f")]);
+        this.set(this.get());
         __classPrivateFieldSet(this, _Undoable_index, 0, "f");
         return this;
     }
