@@ -1,5 +1,5 @@
 export class Undoable<T = unknown> {
-	#stack: T[]
+	#stack: string[]
 	#index = 0
 
 	capacity = 50
@@ -14,7 +14,7 @@ export class Undoable<T = unknown> {
 	}
 
 	get(): T {
-		return this.#stack[this.#index]
+		return JSON.parse(this.#stack[this.#index])
 	}
 
 	/**
@@ -22,56 +22,46 @@ export class Undoable<T = unknown> {
 	 * @returns Succeed in adding it?
 	 */
 	set(newValue: T): boolean {
-		const notEqual = this.notEqual(this.#stack[this.#index], newValue)
+		const newVal = this.validator(newValue)
+		const notEqual = this.#stack[this.#index] !== newVal
 		if (notEqual) {
 			if (this.#stack.length > this.#index + 1) {
 				this.#stack.length = this.#index + 1
 			}
 
-			this.#stack.push(this.validator(newValue))
+			this.#stack.push(newVal)
 			this.#index++
-
-			this.onUpdate()
 
 			if (this.capacity > 1 && this.#stack.length > this.capacity) {
 				this.#stack.shift()
 				this.#index = this.#stack.length
 			}
+
+			this.onUpdate()
 		}
 		return notEqual
 	}
 
 	update(cb: (value: T) => T): boolean {
-		return this.set(cb(this.#stack[this.#index]))
+		return this.set(cb(this.get()))
 	}
 
 	/**
 	 * extend methd
 	 */
-	 onUpdate() {}
-
-	/**
-	 * Method supposed to "extends"
-	 * @param nowValue
-	 * @param newValue
-	 * @returns
-	 */
-	notEqual(nowValue: T, newValue: T): boolean {
-		return nowValue != nowValue
-			? newValue == newValue
-			: nowValue !== newValue ||
-					(nowValue && typeof nowValue === 'object') ||
-					typeof nowValue === 'function'
-	}
+	onUpdate() {}
 
 	/**
 	 * Method supposed to "extends"
 	 * @param value
 	 * @returns
-	 * @ constructor() .set() .clear()
+	 * @used constructor() .set() .clear()
 	 */
-	validator(value: T): T {
-		return value
+	validator(value: T): string {
+		if (typeof value === 'string') {
+			return value
+		}
+		return JSON.stringify(value)
 	}
 
 	undo(): boolean {
@@ -96,7 +86,7 @@ export class Undoable<T = unknown> {
 	}
 	reset(): this {
 		this.#index = 0
-		this.set(this.#stack[this.#index])
+		this.set(this.get())
 		this.#index = 0
 		return this
 	}

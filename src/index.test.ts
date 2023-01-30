@@ -52,7 +52,10 @@ test(`Undoable.length`, (t) => {
 
 test(`Undoable.update`, (t) => {
 	const val = new Undoable([1, 2, 3, 4])
-	t.is(val.update((arr) => arr), true)
+	t.is(
+		val.update((arr) => arr),
+		false,
+	)
 	t.deepEqual(val.get(), [1, 2, 3, 4])
 	val.update((arr) => [...arr.map((v) => v + 1)])
 	t.deepEqual(val.get(), [2, 3, 4, 5])
@@ -74,37 +77,10 @@ test(`ExUndoable.validator`, (t) => {
 	val.undo()
 	val.undo()
 	val.redo()
-	t.is(val.get(), '3')
+	t.is(val.get(), 3)
 })
 
-test(`ExUndoable.notEqual`, (t) => {
-	class ExUndoable<T = unknown> extends Undoable<T> {
-		notEqual(nowValue: T, newValue: T): boolean {
-			return JSON.stringify(nowValue) !== JSON.stringify(newValue)
-		}
-	}
-	const val = new ExUndoable<{}[]>([{ x: 0, y: 0 }])
-	t.is(val.set([{ x: 0, y: 0 }]), false)
-	t.is(val.canUndo(), false)
-	t.is(val.set([{ x: 0, y: 0 }]), false)
-	t.is(val.canUndo(), false)
-
-	val.set([{ y: 0, x: 0 }])
-	t.is(val.canUndo(), true)
-	val.set([{ y: 0, x: 0 }])
-	t.is(val.canUndo(), true)
-
-	t.is(val.set([{ x: 0, y: 0, z: 8 }]), true)
-	t.is(val.set([{ x: 0 }]), true)
-	t.is(val.set([{ y: 0 }]), true)
-	val.undo()
-	val.undo()
-	val.redo()
-	val.undo()
-	t.deepEqual(val.get(), [{ x: 0, y: 0, z: 8 }])
-})
-
-test(`Undoable.notEqual`, (t) => {
+test(`Undoable`, (t) => {
 	const val = new Undoable<{}[]>([{ x: 0, y: 0 }])
 	t.is(val.set([]), true)
 	t.is(val.canUndo(), true)
@@ -122,7 +98,7 @@ test(`Undoable.notEqual`, (t) => {
 	t.is(val.canUndo(), true)
 	t.is(val.undo(), true) //x: 0
 	t.is(val.undo(), true) //x: 0, y: 0, z: 8
-	t.is(val.redo(), true) //x: 0 - failed?
+	t.is(val.redo(), true) //x: 0
 	t.is(val.undo(), true) //x: 0, y: 0, z: 8
 	t.deepEqual(val.get(), [{ x: 0, y: 0, z: 8 }])
 })
@@ -150,7 +126,6 @@ test(`Undoable.clear`, (t) => {
 	val.clear([])
 	t.is(val.canUndo(), false)
 	t.deepEqual(val.get(), [])
-
 
 	val.set([{ x: 0, y: 0, z: 8 }])
 	val.set([{ x: 0 }])
