@@ -1,10 +1,14 @@
+export interface UndoableOptions {
+	capacity?: number
+}
+
 export class Undoable<T = unknown> {
 	#stack: string[]
 	#index = 0
 
 	capacity = 50
 
-	constructor(initial: T, options?: { capacity: number }) {
+	constructor(initial: T, options?: UndoableOptions) {
 		this.#stack = [this.validator(initial)]
 		this.capacity = options?.capacity ?? this.capacity
 	}
