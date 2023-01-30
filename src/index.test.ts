@@ -179,3 +179,52 @@ test(`Undoable capacity over`, (t) => {
 	t.is(val.redo(), true)
 	t.deepEqual(val.get(), [{ x: 0 }])
 })
+
+test(`ExUndoable actions array`, (t) => {
+	const actions = ['Initial state']
+
+	class ExUndoable<T> extends Undoable {
+		onCapacityOver(): void {
+			actions.shift()
+		}
+		set(value: T, action?: string): boolean {
+			if (!action) {
+				throw new Error(`(${action}): action is invalid`)
+			}
+			const bool = super.set(value)
+			if (bool) {
+				actions.push(action)
+			}
+			return bool
+		}
+	}
+
+	const val = new ExUndoable([{ x: 0, y: 0 }])
+	val.capacity = 3
+	val.set([{ x: 1, y: 0 }], '1')
+	val.set([{ x: 2, y: 0, z: 8 }], '2')
+	t.deepEqual(actions, ['Initial state', '1', '2'])
+	val.set([{ x: 3 }], '3')
+	val.set([{ y: 4 }], '4')
+	t.deepEqual(actions, ['2', '3', '4'])
+
+	t.is(val.set([{ x: 0, y: 0, z: 8 }], '1'), true)
+	t.is(val.set([{ x: 0 }], '3'), true)
+	t.is(val.set([{ y: 0 }], '3'), true)
+
+	t.deepEqual(actions, ['1', '3', '3'])
+
+	t.deepEqual(val.get(), [{ y: 0 }])
+
+	t.is(val.length, 3)
+	t.is(val.canUndo(), true)
+	t.is(val.undo(), true)
+	t.deepEqual(val.get(), [{ x: 0 }])
+	t.is(val.undo(), true)
+	t.deepEqual(val.get(), [{ x: 0, y: 0, z: 8 }])
+	t.is(val.undo(), false)
+	t.deepEqual(val.get(), [{ x: 0, y: 0, z: 8 }])
+	t.is(val.redo(), true)
+	t.deepEqual(val.get(), [{ x: 0 }])
+})
+

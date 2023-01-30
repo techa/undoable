@@ -39,9 +39,9 @@ export class Undoable<T = unknown> {
 			if (this.capacity > 1 && this.#stack.length > this.capacity) {
 				this.#stack.shift()
 				this.#index = this.#stack.length - 1
-			}
 
-			this.onUpdate()
+				this.onCapacityOver()
+			}
 		}
 		return notEqual
 	}
@@ -53,7 +53,7 @@ export class Undoable<T = unknown> {
 	/**
 	 * extend methd
 	 */
-	onUpdate() {}
+	onCapacityOver() {}
 
 	/**
 	 * Method supposed to "extends"
